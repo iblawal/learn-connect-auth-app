@@ -16,7 +16,7 @@ console.log("MONGO_URI:", process.env.MONGO_URI ? " Loaded" : " Missing");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Fixed CORS - properly filter out undefined values
+
 const allowedOrigins: string[] = [
   'http://localhost:3000',
   'my-app-rose-six.vercel.app', 
