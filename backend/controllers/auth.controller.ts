@@ -8,9 +8,6 @@ import {
 } from "../utils/sendEmail";
 import mongoose from "mongoose";
 
-// @desc    Register new user
-// @route   POST /api/auth/register
-// @access  Public
 export const register = async (req: Request, res: Response) => {
   try {
     const { fullName, email, password, phone } = req.body;

@@ -24,7 +24,7 @@ export default function LoginPage() {
     } catch (err: any) {
       console.error(" Login failed:", err);
       
-      // Better error handling
+      //  to handle error
       if (err.response?.status === 403) {
         setError(" Please verify your email before logging in!");
       } else if (err.response?.status === 401) {
@@ -47,7 +47,7 @@ export default function LoginPage() {
         transition={{ duration: 0.6 }}
         className="w-full max-w-md bg-white/10 backdrop-blur-lg rounded-2xl shadow-xl p-8 border border-white/20"
       >
-        {/* Company Name */}
+        {}
         <motion.h2
           initial={{ opacity: 0, y: -15 }}
           animate={{ opacity: 1, y: 0 }}
@@ -57,7 +57,7 @@ export default function LoginPage() {
           Learn<span className="text-brandGold">&</span>Connect
         </motion.h2>
 
-        {/* Title */}
+        {}
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -67,7 +67,7 @@ export default function LoginPage() {
           Log In
         </motion.h1>
 
-        {/* Error Message */}
+        {}
         {error && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -78,7 +78,7 @@ export default function LoginPage() {
           </motion.div>
         )}
 
-        {/* Login Form */}
+        {}
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="block text-sm font-semibold text-brandEmerald mb-1">
