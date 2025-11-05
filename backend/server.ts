@@ -30,7 +30,7 @@ app.use(cors({
 
 app.use(bodyParser.json());
 
-console.log("✅ Middleware initialized...");
+console.log(" Middleware initialized...");
 
 app.use("/api/auth", authRoutes);  
 
@@ -46,7 +46,7 @@ mongoose
 
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("✅ Backend API is running successfully!");
+  res.send(" Backend API is running successfully!");
 });
 
 app.listen(PORT, () => {
