@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { authService } from "@/lib/service/auth.service";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
+import { Eye, EyeOff } from "lucide-react"; 
 
 export default function SignupPage() {
   const router = useRouter();
@@ -14,10 +15,15 @@ export default function SignupPage() {
     fullName: "",
     email: "",
     password: "",
+    confirmPassword: "", 
   });
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  
+  
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -26,18 +32,31 @@ export default function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match!");
+      return;
+    }
+
+    
+    if (formData.password.length < 6) {
+      setError("Password must be at least 6 characters long");
+      return;
+    }
+
+    if (!phoneNumber) {
+      setError("Please enter your phone number");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      if (!phoneNumber) {
-        setError("Please enter your phone number");
-        setIsLoading(false);
-        return;
-      }
+      console.log("Sending registration request...");
+      console.log(" Email:", formData.email);
 
-      console.log("📤 Sending registration request...");
-
-      // Call backend API
+      
       const response = await authService.register({
         fullName: formData.fullName,
         email: formData.email,
@@ -46,29 +65,28 @@ export default function SignupPage() {
       });
 
       console.log(" Backend Response:", response);
+      console.log(" Response success:", response.success);
+      console.log(" Response message:", response.message);
 
-      //  IMPROVED: Check multiple possible success indicators
-      if (response.success || response.data || response.message?.toLowerCase().includes("success")) {
-        console.log(" Registration successful! Redirecting...");
+    
+      if (response) {
+        console.log(" Registration completed! Redirecting to verification...");
         
-        // Always redirect to verification page
-        router.push(`/email-verification?email=${encodeURIComponent(formData.email)}`);
-      } else {
-        // If backend returns error
-        setError(response.message || "Registration failed. Please try again.");
+    
+        window.location.href = `/email-verification?email=${encodeURIComponent(formData.email)}`;
       }
     } catch (err: any) {
       console.error(" Registration Error:", err);
-      console.error("Error Response:", err.response?.data);
+      console.error(" Error Response:", err.response?.data);
       
-      //  IMPROVED: Better error messages
+      
       if (err.response?.data) {
         setError(err.response.data.message || err.response.data.error || "Registration failed");
       } else if (err.response?.status === 409) {
         setError("Email already exists. Please login instead.");
       } else if (err.response?.status === 500) {
         setError("Server error. Please try again later.");
-      } else if (err.message.includes("Network Error")) {
+      } else if (err.message?.includes("Network Error")) {
         setError("Cannot connect to server. Please check your internet connection.");
       } else {
         setError(err.message || "An error occurred during registration");
@@ -93,15 +111,19 @@ export default function SignupPage() {
           Join Learn & Connect to meet coursemates worldwide
         </p>
 
-        {/* Error Message */}
+        {}
         {error && (
-          <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-white text-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-white text-sm"
+          >
              {error}
-          </div>
+          </motion.div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Full Name */}
+          {}
           <div>
             <label className="block text-sm font-semibold text-brandEmerald mb-1">
               Full Name
@@ -117,7 +139,7 @@ export default function SignupPage() {
             />
           </div>
 
-          {/* Email */}
+          {}
           <div>
             <label className="block text-sm font-semibold text-brandEmerald mb-1">
               Email Address
@@ -133,7 +155,7 @@ export default function SignupPage() {
             />
           </div>
 
-          {/* Phone Number */}
+          {}
           <div>
             <label className="block text-sm font-semibold text-brandEmerald mb-1">
               Phone Number
@@ -150,22 +172,77 @@ export default function SignupPage() {
             </p>
           </div>
 
-          {/* Password */}
+          {}
           <div>
             <label className="block text-sm font-semibold text-brandEmerald mb-1">
               Password
             </label>
-            <input
-              type="password"
-              name="password"
-              placeholder="••••••••"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              minLength={6}
-              className="w-full px-3 py-2.5 rounded-lg bg-white/80 text-gray-800 placeholder-gray-500 border border-brandEmerald/40 focus:outline-none focus:ring-2 focus:ring-brandGold"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="••••••••"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                minLength={6}
+                className="w-full px-3 py-2.5 pr-10 rounded-lg bg-white/80 text-gray-800 placeholder-gray-500 border border-brandEmerald/40 focus:outline-none focus:ring-2 focus:ring-brandGold"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-800 transition"
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
+            </div>
             <p className="text-xs text-white/60 mt-1">Minimum 6 characters</p>
+          </div>
+
+          {}
+          <div>
+            <label className="block text-sm font-semibold text-brandEmerald mb-1">
+              Confirm Password
+            </label>
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                name="confirmPassword"
+                placeholder="••••••••"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
+                minLength={6}
+                className="w-full px-3 py-2.5 pr-10 rounded-lg bg-white/80 text-gray-800 placeholder-gray-500 border border-brandEmerald/40 focus:outline-none focus:ring-2 focus:ring-brandGold"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-800 transition"
+              >
+                {showConfirmPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
+            </div>
+            {/* Password Match Indicator */}
+            {formData.confirmPassword && (
+              <p className={`text-xs mt-1 ${
+                formData.password === formData.confirmPassword 
+                  ? "text-green-400" 
+                  : "text-red-400"
+              }`}>
+                {formData.password === formData.confirmPassword 
+                  ? "✓ Passwords match" 
+                  : "✗ Passwords do not match"}
+              </p>
+            )}
           </div>
 
           {/* Submit Button */}
@@ -202,7 +279,7 @@ export default function SignupPage() {
           </motion.button>
         </form>
 
-        {/* Login Link */}
+        {}
         <p className="text-center text-sm text-white/70 mt-6">
           Already have an account?{" "}
           <Link
@@ -214,7 +291,7 @@ export default function SignupPage() {
         </p>
       </motion.div>
 
-      {/* Phone Input Styles */}
+      {}
       <style jsx global>{`
         .intl-phone-custom .react-international-phone-input-container {
           width: 100%;
