@@ -1,12 +1,12 @@
 "use client";
-
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import "../styles/auth-bg.css";
 
 export default function LoginPage() {
-  const { login } = useAuth(); 
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,21 +18,22 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      console.log(" Logging in...");
       await login(email, password);
-      console.log(" Login successful!");
     } catch (err: any) {
-      console.error(" Login failed:", err);
-      
-      //  to handle error
+      console.error("Login failed:", err);
+
       if (err.response?.status === 403) {
-        setError(" Please verify your email before logging in!");
+        setError("Please verify your email before logging in!");
       } else if (err.response?.status === 401) {
-        setError(" Invalid email or password");
+        setError("Invalid email or password");
       } else if (err.message?.includes("verify")) {
-        setError(" Please verify your email before logging in!");
+        setError("Please verify your email before logging in!");
       } else {
-        setError(err.response?.data?.message || err.message || "Login failed. Please try again.");
+        setError(
+          err.response?.data?.message ||
+            err.message ||
+            "Login failed. Please try again."
+        );
       }
     } finally {
       setLoading(false);
@@ -40,47 +41,46 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-brandSky via-brandGold/10 to-brandEmerald/20 px-4">
+    <div className="min-h-screen flex items-center justify-center animated-bg px-4 py-10">
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="w-full max-w-md bg-white/10 backdrop-blur-lg rounded-2xl shadow-xl p-8 border border-white/20"
+        transition={{ duration: 0.8 }}
+        className="w-full max-w-md bg-white/10 backdrop-blur-2xl rounded-3xl shadow-2xl p-10 border border-white/20 relative z-10"
       >
         {}
-        <motion.h2
-          initial={{ opacity: 0, y: -15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="text-center text-white font-bold text-2xl mb-6 tracking-wide"
-        >
-          Learn<span className="text-brandGold">&</span>Connect
-        </motion.h2>
-
-        {}
-        <motion.h1
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="text-2xl font-semibold text-center text-white mb-8"
+          transition={{ duration: 0.7 }}
+          className="text-center mb-8"
         >
-          Log In
-        </motion.h1>
+          <h2 className="text-3xl font-bold text-white mb-2 tracking-wide">
+            Learn<span className="text-brandGold">&</span>Connect
+          </h2>
+          <p className="text-white/70 text-sm">
+            Welcome back! Log in to continue your learning journey.
+          </p>
+        </motion.div>
 
         {}
         {error && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="bg-red-500/20 border border-red-500/50 text-white text-center p-3 rounded-lg mb-4"
+            className="bg-red-500/20 border border-red-400/50 text-white text-center p-3 rounded-lg mb-4 text-sm"
           >
             {error}
           </motion.div>
         )}
 
         {}
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
             <label className="block text-sm font-semibold text-brandEmerald mb-1">
               Email Address
             </label>
@@ -90,11 +90,15 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-3 py-2.5 rounded-lg bg-white/80 text-gray-800 placeholder-gray-500 border border-brandEmerald/40 focus:outline-none focus:ring-2 focus:ring-brandGold"
+              className="w-full px-4 py-2.5 rounded-lg bg-white/90 text-gray-800 placeholder-gray-500 border border-brandEmerald/30 focus:outline-none focus:ring-2 focus:ring-brandGold"
             />
-          </div>
+          </motion.div>
 
-          <div>
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
             <label className="block text-sm font-semibold text-brandEmerald mb-1">
               Password
             </label>
@@ -104,9 +108,9 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-3 py-2.5 rounded-lg bg-white/80 text-gray-800 placeholder-gray-500 border border-brandEmerald/40 focus:outline-none focus:ring-2 focus:ring-brandGold"
+              className="w-full px-4 py-2.5 rounded-lg bg-white/90 text-gray-800 placeholder-gray-500 border border-brandEmerald/30 focus:outline-none focus:ring-2 focus:ring-brandGold"
             />
-          </div>
+          </motion.div>
 
           <div className="text-right">
             <Link
@@ -118,17 +122,32 @@ export default function LoginPage() {
           </div>
 
           <motion.button
-            whileHover={{ scale: loading ? 1 : 1.02 }}
-            whileTap={{ scale: loading ? 1 : 0.98 }}
+            whileHover={{ scale: loading ? 1 : 1.03 }}
+            whileTap={{ scale: loading ? 1 : 0.97 }}
             type="submit"
             disabled={loading}
             className="w-full bg-brandEmerald text-white font-semibold py-3 rounded-lg hover:bg-brandGold transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
-                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                <svg
+                  className="animate-spin h-5 w-5"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    fill="none"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.37 0 0 5.37 0 12h4zm2 5.29A7.96 7.96 0 014 12H0c0 3.04 1.13 5.82 3 7.94l3-2.65z"
+                  />
                 </svg>
                 Logging in...
               </span>
@@ -138,15 +157,20 @@ export default function LoginPage() {
           </motion.button>
         </form>
 
-        <p className="text-center text-sm text-white/70 mt-6">
-          Don't have an account?{" "}
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="text-center text-sm text-white/80 mt-8"
+        >
+          Don’t have an account?{" "}
           <Link
             href="/signup"
             className="text-brandGold hover:text-white font-semibold transition"
           >
             Sign Up
           </Link>
-        </p>
+        </motion.p>
       </motion.div>
     </div>
   );

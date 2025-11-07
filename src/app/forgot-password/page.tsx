@@ -1,9 +1,9 @@
 "use client";
-
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import "../styles/auth-bg.css";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -18,13 +18,8 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
 
     try {
-      // TODO: Add forgot password API call
-      // For now, simulate success
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
       setSuccess(true);
-      
-      // Redirect to reset password page after 3 seconds
       setTimeout(() => {
         router.push(`/reset-password?email=${encodeURIComponent(email)}`);
       }, 3000);
@@ -78,7 +73,7 @@ export default function ForgotPasswordPage() {
           </p>
         </div>
 
-        {/* Error Message */}
+        {}
         {error && (
           <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-white text-sm">
              {error}
@@ -86,7 +81,7 @@ export default function ForgotPasswordPage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Email Input */}
+          {}
           <div>
             <label className="block text-sm font-semibold text-brandEmerald mb-1">
               Email Address
@@ -101,7 +96,7 @@ export default function ForgotPasswordPage() {
             />
           </div>
 
-          {/* Submit Button */}
+          {}
           <motion.button
             whileHover={{ scale: isLoading ? 1 : 1.02 }}
             whileTap={{ scale: isLoading ? 1 : 0.98 }}
@@ -123,7 +118,7 @@ export default function ForgotPasswordPage() {
           </motion.button>
         </form>
 
-        {/* Back to Login */}
+        {}
         <div className="mt-6 text-center">
           <Link
             href="/login"

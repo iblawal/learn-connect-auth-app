@@ -8,7 +8,7 @@ export default function Header() {
 
   return (
     <header className="flex items-center justify-between bg-brandSky/80 backdrop-blur-md px-6 py-4 shadow-md sticky top-0 z-50">
-      <h1 className="text-lg font-semibold">MyApp</h1>
+      <h1 className="text-lg font-semibold">Learn & Connect</h1>
 
       <div className="flex items-center gap-3">
         {isAuthenticated ? (

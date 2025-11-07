@@ -1,384 +1,420 @@
 "use client";
-
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { BookOpen, TrendingUp, Users } from "lucide-react";
+import Image from "next/image";
 import { motion } from "framer-motion";
-import { User, LogOut, Search, BookOpen, Users, TrendingUp, Edit } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
-import { profileService } from "@/lib/service/profileService";
-import type { User as APIUser, DashboardStats as APIDashboardStats } from "@/lib/service/profileService";
-import ProtectedRoute from "@/components/ProtectedRoute";
+import {
+  User,
+  LogOut,
+  Menu,
+  Sun,
+  Moon,
+  Camera,
+  Image as ImageIcon,
+  Upload,
+  Settings,
+  Search,
+} from "lucide-react";
 
-export default function DashboardPage() {
-  const { user: authUser, logout } = useAuth();
-  const [stats, setStats] = useState<APIDashboardStats | null>(null);
-  const [students, setStudents] = useState<APIUser[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
+
+type Props = {
+  children?: React.ReactNode;
+};
+
+export default function DashboardLayout({ children }: Props) {
+  const [collapsed, setCollapsed] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  
+  const [user, setUser] = useState({
+    fullName: "Ibrahim Lawal",
+    email: "ibrahim@example.com",
+    avatar: "", 
+    profileCompleted: false,
+  });
 
   useEffect(() => {
-    fetchDashboardData();
+    const stored = typeof window !== "undefined" && localStorage.getItem("lc:theme");
+    if (stored === "light" || stored === "dark") setTheme(stored);
   }, []);
 
-  const fetchDashboardData = async () => {
-    try {
-      // Try to fetch dashboard stats
-      try {
-        const statsResponse = await profileService.getDashboardStats();
-        if (statsResponse.success) {
-          setStats(statsResponse.data);
-        }
-      } catch (statsErr: any) {
-        console.warn(" Could not load stats:", statsErr.message);
-        // Don't show error, just use default values
-      }
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const root = document.documentElement;
+    if (theme === "dark") {
+      root.classList.remove("lc-light");
+      root.classList.add("lc-dark");
+    } else {
+      root.classList.remove("lc-dark");
+      root.classList.add("lc-light");
+    }
+    localStorage.setItem("lc:theme", theme);
+  }, [theme]);
 
-      // Try to fetch students
-      try {
-        const studentsResponse = await profileService.getAllUsers();
-        if (studentsResponse.success) {
-          setStudents(studentsResponse.data);
-        }
-      } catch (studentsErr: any) {
-        console.warn(" Could not load students:", studentsErr.message);
-      }
-    } catch (err: any) {
-      console.error("Dashboard error:", err);
-      setError("Some features may not be available right now");
-    } finally {
-      setIsLoading(false);
+  const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
+  const toggleCollapsed = () => setCollapsed((c) => !c);
+
+  const handleFileSelect = (file?: File | null) => {
+    if (!file) return;
+    setUploading(true);
+    const reader = new FileReader();
+    reader.onload = () => {
+    
+      setUser((u) => ({ ...u, avatar: String(reader.result) }));
+      setUploading(false);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const openFilePicker = () => fileInputRef.current?.click();
+
+  const handleCameraCapture = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const track = stream.getVideoTracks()[0];
+      const imageCapture = new (window as any).ImageCapture(track);
+      const blob = await imageCapture.takePhoto();
+      track.stop();
+      handleFileSelect(new File([blob], "camera.jpg", { type: blob.type }));
+    } catch (err) {
+      console.warn("Camera capture failed (browser may block); falling back to file picker.", err);
+      openFilePicker();
     }
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLibrarySelect = () => {
+    openFilePicker();
   };
 
-  const filteredStudents = students.filter((student) =>
-    student.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    student.university?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    student.course?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-brandSky via-brandEmerald/10 to-brandGold/10">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-brandGold mx-auto"></div>
-          <p className="mt-4 text-brandEmerald text-xl font-semibold">
-            Loading your dashboard...
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // Use authUser as fallback if stats not loaded
-  const displayUser = stats?.user || authUser;
-  const displayStats = stats?.stats || { totalUsers: 0, sameUniversity: 0, sameCourse: 0 };
+  const initials = (name = "User") => {
+    const parts = name.split(" ");
+    const first = parts[0]?.[0] ?? "U";
+    const second = parts[1]?.[0] ?? "";
+    return (first + second).toUpperCase();
+  };
 
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen flex flex-col lg:flex-row bg-linear-to-br from-brandSky via-brandEmerald/10 to-brandGold/10 text-white">
-        {/* Sidebar */}
-        <aside className="lg:w-64 w-full bg-brandEmerald/30 backdrop-blur-md border-r border-brandEmerald/40 p-6 space-y-8 flex flex-row lg:flex-col justify-between lg:justify-start items-center lg:items-start">
-          <div className="flex items-center space-x-3">
-            <User className="w-8 h-8 text-brandGold" />
-            <h2 className="text-2xl font-bold text-brandGold">Learn & Connect</h2>
-          </div>
-
-          <nav className="flex flex-row lg:flex-col gap-6">
-            <a href="#profile" className="hover:text-brandGold transition flex items-center gap-2">
-              <User className="w-5 h-5" /> Profile
-            </a>
-            <a href="#stats" className="hover:text-brandGold transition flex items-center gap-2">
-              <TrendingUp className="w-5 h-5" /> Stats
-            </a>
-            <a href="#directory" className="hover:text-brandGold transition flex items-center gap-2">
-              <Users className="w-5 h-5" /> Directory
-            </a>
-            <button
-              onClick={handleLogout}
-              className="text-red-400 hover:text-red-300 transition flex items-center gap-2"
-            >
-              <LogOut className="w-5 h-5" /> Logout
-            </button>
-          </nav>
-        </aside>
-
-        {/* Main Content */}
-        <main className="flex-1 p-8 space-y-12 overflow-y-auto">
-          {/* Error Message */}
-          {error && (
-            <div className="bg-yellow-500/20 border border-yellow-500/50 text-white px-4 py-3 rounded-lg backdrop-blur-md">
-               {error}
+    <div className="min-h-screen flex bg-[linear-gradient(180deg,#0f172a,rgba(8,9,20,0.6))] text-white">
+      {}
+      <aside
+        className={`shrink-0 transition-all duration-300 ease-in-out flex flex-col z-20
+          ${collapsed ? "w-20" : "w-64"} bg-[#1b3995] border-r border-black/20`}
+      >
+        {}
+        <div className="p-4">
+          <div className="flex items-center gap-3">
+            <div className={`relative ${collapsed ? "w-10 h-10" : "w-14 h-14"}`}> 
+              {user.avatar ? (
+                // next/image could be used, but keep simple img to accept data URLs too
+                <img
+                  src={user.avatar}
+                  alt="avatar"
+                  className="w-full h-full rounded-full object-cover border-2 border-white/20 shadow-sm"
+                />
+              ) : (
+                <div
+                  className={`w-full h-full rounded-full flex items-center justify-center bg-white/10 text-xl font-semibold text-white`}
+                >
+                  {initials(user.fullName)}
+                </div>
+              )}
             </div>
-          )}
 
-          {/* Header */}
-          <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-            <div>
-              <h1 className="text-4xl font-bold text-brandGold">
-                Welcome back, {displayUser?.fullName?.split(" ")[0] || "User"} 
-              </h1>
-              <p className="text-brandSky/90 mt-2 text-lg">
-                Explore your Learn & Connect dashboard
-              </p>
-            </div>
-            <img
-              src={`https://ui-avatars.com/api/?name=${displayUser?.fullName || "User"}&background=0D9488&color=fff&bold=true`}
-              alt="User avatar"
-              className="w-16 h-16 rounded-full border-4 border-brandGold shadow-lg mt-4 sm:mt-0"
-            />
-          </header>
+            {!collapsed && (
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-sm font-semibold">{user.fullName}</div>
+                    <div className="text-xs text-white/80">{user.email}</div>
+                  </div>
 
-          {/* Profile Completion Warning */}
-          {displayUser && !displayUser.profileCompleted && (
-            <motion.div
-              className="bg-yellow-500/20 border-2 border-yellow-500/50 rounded-2xl p-6 backdrop-blur-md"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4 }}
-            >
-              <div className="flex items-start gap-4">
-                <div className="text-3xl"></div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold text-yellow-300 mb-2">
-                    Complete Your Profile
-                  </h3>
-                  <p className="text-white/90 mb-3">
-                    Fill in your profile information to connect with coursemates and unlock all features!
-                  </p>
+                  {}
+                  <div className="relative">
+                    <button
+                      onClick={() => setProfileMenuOpen((s) => !s)}
+                      className="ml-3 p-2 rounded-md bg-white/6 hover:bg-white/10 transition"
+                      aria-expanded={profileMenuOpen}
+                      aria-label="Profile options"
+                    >
+                      <User className="w-4 h-4" />
+                    </button>
+
+                    {profileMenuOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        className="absolute right-0 mt-2 w-56 bg-white/6 backdrop-blur-md border border-white/10 rounded-lg shadow-lg p-2"
+                      >
+                        <button
+                          onClick={openFilePicker}
+                          className="w-full text-left px-3 py-2 rounded-md hover:bg-white/5 flex items-center gap-2"
+                        >
+                          <Upload className="w-4 h-4" /> Upload from file
+                        </button>
+                        <button
+                          onClick={handleCameraCapture}
+                          className="w-full text-left px-3 py-2 rounded-md hover:bg-white/5 flex items-center gap-2"
+                        >
+                          <Camera className="w-4 h-4" /> Take photo (camera)
+                        </button>
+                        <button
+                          onClick={handleLibrarySelect}
+                          className="w-full text-left px-3 py-2 rounded-md hover:bg-white/5 flex items-center gap-2"
+                        >
+                          <ImageIcon className="w-4 h-4" /> Choose from library
+                        </button>
+                        <div className="border-t border-white/6 mt-2 pt-2">
+                          <button
+                            onClick={() => {
+                              alert("Open profile settings (implement)");
+                            }}
+                            className="w-full text-left px-3 py-2 rounded-md hover:bg-white/5 flex items-center gap-2"
+                          >
+                            <Settings className="w-4 h-4" /> Profile Settings
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </div>
+                </div>
+
+                {}
+                <div className="mt-3">
                   <a
                     href="/profile/edit"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-brandGold rounded-lg hover:bg-brandGold/80 transition font-semibold"
+                    className="inline-block px-3 py-1 rounded-md text-xs bg-white/6 hover:bg-white/8"
                   >
-                    <Edit className="w-5 h-5" />
-                    Complete Profile Now
+                    Complete profile
                   </a>
                 </div>
               </div>
-            </motion.div>
-          )}
+            )}
+          </div>
+        </div>
 
-          {/* Stats Grid */}
-          <section id="stats">
-            <h2 className="text-3xl font-bold text-brandGold mb-6">Your Stats</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <motion.div
-                className="bg-brandEmerald/20 border border-brandEmerald/30 rounded-2xl shadow-lg p-6 backdrop-blur-md hover:border-brandGold transition"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-              >
-                <div className="flex items-center gap-4">
-                  <div className="p-4 bg-brandGold/30 rounded-full">
-                    <Users className="w-8 h-8 text-brandGold" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-white/70 uppercase tracking-wide">Total Students</p>
-                    <p className="text-4xl font-bold text-brandGold">
-                      {displayStats.totalUsers}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
+        {}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={(e) => handleFileSelect(e.target.files?.[0] ?? null)}
+          className="hidden"
+        />
 
-              <motion.div
-                className="bg-brandEmerald/20 border border-brandEmerald/30 rounded-2xl shadow-lg p-6 backdrop-blur-md hover:border-brandGold transition"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
+        {}
+        <nav className="flex-1 px-2 mt-4">
+          <ul className="space-y-1">
+            <li>
+              <a
+                href="#dashboard"
+                className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-white/6 transition text-sm"
               >
-                <div className="flex items-center gap-4">
-                  <div className="p-4 bg-brandSky/30 rounded-full">
-                    <BookOpen className="w-8 h-8 text-brandSky" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-white/70 uppercase tracking-wide">Same University</p>
-                    <p className="text-4xl font-bold text-brandSky">
-                      {displayStats.sameUniversity}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
+                <Menu className="w-5 h-5" />
+                {!collapsed && <span>Dashboard</span>}
+              </a>
+            </li>
 
-              <motion.div
-                className="bg-brandEmerald/20 border border-brandEmerald/30 rounded-2xl shadow-lg p-6 backdrop-blur-md hover:border-brandGold transition"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
+            <li>
+              <a
+                href="#directory"
+                className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-white/6 transition text-sm"
               >
-                <div className="flex items-center gap-4">
-                  <div className="p-4 bg-brandEmerald/30 rounded-full">
-                    <TrendingUp className="w-8 h-8 text-brandEmerald" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-white/70 uppercase tracking-wide">Same Course</p>
-                    <p className="text-4xl font-bold text-brandEmerald">
-                      {displayStats.sameCourse}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
+                <Search className="w-5 h-5" />
+                {!collapsed && <span>Directory</span>}
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="#courses"
+                className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-white/6 transition text-sm"
+              >
+                <BookOpen className="w-5 h-5" />
+                {!collapsed && <span>Courses</span>}
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="#settings"
+                className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-white/6 transition text-sm"
+              >
+                <Settings className="w-5 h-5" />
+                {!collapsed && <span>Settings</span>}
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        {}
+        <div className="px-4 py-4 border-t border-white/6">
+          <div className="flex items-center justify-between gap-2">
+            <button
+              onClick={() => {
+                
+                alert("Logout clicked — hook to your auth.logout()");
+              }}
+              className="flex items-center gap-2 p-2 rounded-md hover:bg-white/6 w-full justify-center"
+            >
+              <LogOut className="w-4 h-4" />
+              {!collapsed && <span className="text-sm">Logout</span>}
+            </button>
+          </div>
+
+          <div className="mt-3 flex items-center justify-center">
+            <button
+              onClick={toggleCollapsed}
+              className="p-2 rounded-md bg-white/6 hover:bg-white/8"
+            >
+              <Menu className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      {}
+      <div className="flex-1 flex flex-col">
+        {}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/6 bg-transparent">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setCollapsed((c) => !c)}
+              className="p-2 rounded-md bg-white/6 hover:bg-white/8"
+            >
+              <Menu className="w-5 h-5 text-white" />
+            </button>
+            <div className="hidden md:block text-sm text-white/80">Dashboard</div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            {}
+            <div className="hidden sm:flex items-center bg-white/6 rounded-full px-3 py-1 gap-2">
+              <Search className="w-4 h-4" />
+              <input
+                className="bg-transparent outline-none text-sm placeholder:text-white/60"
+                placeholder="Search"
+              />
             </div>
-          </section>
 
-          {/* User Profile Section */}
-          <section id="profile">
-            <motion.div
-              className="bg-brandEmerald/20 border border-brandEmerald/30 rounded-2xl shadow-lg p-8 backdrop-blur-md"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
+            {}
+            <button
+              onClick={toggleTheme}
+              title="Toggle theme"
+              className="p-2 rounded-md bg-white/6 hover:bg-white/8"
             >
-              <div className="flex justify-between items-center border-b border-brandEmerald/30 pb-4 mb-6">
-                <h2 className="text-3xl font-bold text-brandGold">Your Profile</h2>
-                <a
-                  href="/profile/edit"
-                  className="flex items-center gap-2 px-4 py-2 bg-brandGold rounded-lg hover:bg-brandGold/80 transition text-white font-semibold"
+              {theme === "dark" ? <Sun className="w-4 h-4 text-white" /> : <Moon className="w-4 h-4 text-white" />}
+            </button>
+
+            {}
+            <div className="hidden sm:flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-sm">{initials(user.fullName)}</div>
+              <div className="text-sm text-white/90">{user.fullName.split(" ")[0]}</div>
+            </div>
+          </div>
+        </div>
+
+        {}
+        <main className="p-6"> 
+          {}
+          <div className="max-w-7xl mx-auto space-y-8">
+            {}
+            <section className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <h1 className="text-3xl font-bold text-[#16a085]">Welcome back, {user.fullName.split(" ")[0]}</h1>
+                <p className="text-sm text-white/80 mt-1">Explore your Learn & Connect dashboard</p>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <button className="px-4 py-2 rounded-md bg-[#16a085] hover:bg-[#129073] text-white">Create Post</button>
+                <button className="px-4 py-2 rounded-md bg-white/6 hover:bg-white/8">Notifications</button>
+              </div>
+            </section>
+
+            {}
+            <section className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {[
+                { label: "Total Students", value: 1200, color: "#16a085", icon: Users },
+                { label: "Same University", value: 48, color: "#60a5fa", icon: BookOpen },
+                { label: "Same Course", value: 32, color: "#9ae6b4", icon: TrendingUp },
+              ].map((c, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  className="bg-white/6 rounded-2xl p-5 flex items-center justify-between border border-white/6"
                 >
-                  <Edit className="w-5 h-5" />
-                  Edit Profile
-                </a>
-              </div>
-              <div className="grid md:grid-cols-2 gap-6 text-lg">
-                <div>
-                  <p className="text-brandGold/70 text-sm uppercase tracking-wide mb-1">Full Name</p>
-                  <p className="font-semibold text-xl">{displayUser?.fullName || "Not set"}</p>
-                </div>
-                <div>
-                  <p className="text-brandGold/70 text-sm uppercase tracking-wide mb-1">Email</p>
-                  <p className="font-semibold text-xl">{displayUser?.email || "Not set"}</p>
-                </div>
-                <div>
-                  <p className="text-brandGold/70 text-sm uppercase tracking-wide mb-1">University</p>
-                  <p className="font-semibold text-xl">{displayUser?.university || "Not set"}</p>
-                </div>
-                <div>
-                  <p className="text-brandGold/70 text-sm uppercase tracking-wide mb-1">Course</p>
-                  <p className="font-semibold text-xl">{displayUser?.course || "Not set"}</p>
-                </div>
-              </div>
-            </motion.div>
-          </section>
+                  <div>
+                    <p className="text-sm text-white/80 uppercase tracking-wide">{c.label}</p>
+                    <p className="text-2xl font-bold" style={{ color: c.color }}>{c.value}</p>
+                  </div>
+                  <div className="p-3 bg-white/8 rounded-lg">
+                    <c.icon className="w-6 h-6 text-white" />
+                  </div>
+                </motion.div>
+              ))}
+            </section>
 
-          {/* Student Directory */}
-          <section id="directory">
-            <motion.div
-              className="bg-brandEmerald/20 border border-brandEmerald/30 rounded-2xl shadow-lg p-8 backdrop-blur-md"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                <div>
-                  <h2 className="text-3xl font-bold text-brandGold">Student Directory</h2>
-                  <p className="text-white/70 mt-1">
-                    {filteredStudents.length} {filteredStudents.length === 1 ? "student" : "students"} found
-                  </p>
+            {}
+            <section>
+              <div className="bg-white/6 p-6 rounded-2xl border border-white/6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-semibold">Student Directory</h2>
+                  <div className="flex items-center gap-2">
+                    <input className="px-3 py-2 rounded-md bg-transparent border border-white/6 placeholder:text-white/60 outline-none text-sm" placeholder="Search students..." />
+                    <button className="px-3 py-2 rounded-md bg-white/8">Search</button>
+                  </div>
                 </div>
-                <div className="relative w-full sm:w-auto">
-                  <Search className="absolute left-3 top-3 text-brandGold w-5 h-5" />
-                  <input
-                    type="text"
-                    placeholder="Search students..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-11 pr-4 py-3 w-full sm:w-64 rounded-lg bg-white/90 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brandGold font-medium"
-                  />
-                </div>
-              </div>
 
-              {filteredStudents.length === 0 ? (
-                <div className="text-center py-12">
-                  <Users className="w-16 h-16 text-brandGold/50 mx-auto mb-4" />
-                  <p className="text-white/70 text-lg">
-                    {searchTerm ? "No students match your search" : "Complete your profile to see other students"}
-                  </p>
-                </div>
-              ) : (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredStudents.map((student, index) => (
-                    <motion.div
-                      key={student._id}
-                      className="bg-white/10 rounded-xl p-6 border border-brandEmerald/30 hover:border-brandGold hover:bg-white/15 transition cursor-pointer"
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.3, delay: index * 0.05 }}
-                    >
-                      <div className="flex items-center gap-3 mb-4">
-                        <img
-                          src={student.profilePicture || `https://ui-avatars.com/api/?name=${student.fullName}&background=0D9488&color=fff&bold=true`}
-                          alt={student.fullName}
-                          className="w-12 h-12 rounded-full border-2 border-brandGold"
-                        />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {}
+                  {[1,2,3,4,5,6].map((n) => (
+                    <div key={n} className="bg-transparent p-4 rounded-lg border border-white/6">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">AB</div>
                         <div>
-                          <h3 className="text-lg font-semibold text-brandGold">
-                            {student.fullName}
-                          </h3>
-                          <p className="text-sm text-white/70">{student.yearOfStudy || "Student"}</p>
+                          <div className="font-semibold">Student {n}</div>
+                          <div className="text-sm text-white/80">University · Course</div>
                         </div>
                       </div>
-                      <div className="space-y-2 text-sm">
-                        <p className="text-white/80">
-                          <span className="font-semibold text-brandGold">University:</span>{" "}
-                          {student.university || "Not specified"}
-                        </p>
-                        <p className="text-white/80">
-                          <span className="font-semibold text-brandGold">Course:</span>{" "}
-                          {student.course || "Not specified"}
-                        </p>
-                        {student.interests && student.interests.length > 0 && (
-                          <p className="text-white/80">
-                            <span className="font-semibold text-brandGold">Interests:</span>{" "}
-                            {student.interests.join(", ")}
-                          </p>
-                        )}
-                      </div>
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
-              )}
-            </motion.div>
-          </section>
-
-          {/* Quick Actions */}
-          <section>
-            <motion.div
-              className="bg-brandEmerald/20 border border-brandEmerald/30 rounded-2xl shadow-lg p-8 backdrop-blur-md"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <h2 className="text-3xl font-bold text-brandGold mb-6">Quick Actions</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <a
-                  href="/directory"
-                  className="p-6 bg-white/10 border-2 border-brandEmerald/30 rounded-xl hover:border-brandGold hover:bg-white/15 transition group"
-                >
-                  <Users className="w-10 h-10 text-brandGold mb-3 group-hover:scale-110 transition" />
-                  <h4 className="font-bold text-xl text-brandGold mb-2">Browse All Students</h4>
-                  <p className="text-white/70">
-                    Explore the full directory and connect with coursemates
-                  </p>
-                </a>
-
-                <a
-                  href="/profile/edit"
-                  className="p-6 bg-white/10 border-2 border-brandEmerald/30 rounded-xl hover:border-brandGold hover:bg-white/15 transition group"
-                >
-                  <Edit className="w-10 h-10 text-brandGold mb-3 group-hover:scale-110 transition" />
-                  <h4 className="font-bold text-xl text-brandGold mb-2">Update Profile</h4>
-                  <p className="text-white/70">
-                    Keep your information current and complete
-                  </p>
-                </a>
               </div>
-            </motion.div>
-          </section>
+            </section>
+
+            {}
+            <section>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-white/6 p-6 rounded-2xl border border-white/6">
+                  <h3 className="font-semibold mb-2">Quick Actions</h3>
+                  <div className="flex gap-3 mt-3">
+                    <button className="px-4 py-2 bg-[#16a085] rounded-md">Connect</button>
+                    <button className="px-4 py-2 bg-white/8 rounded-md">Message</button>
+                  </div>
+                </div>
+
+                <div className="bg-white/6 p-6 rounded-2xl border border-white/6">
+                  <h3 className="font-semibold mb-2">Recommended Courses</h3>
+                  <ul className="mt-3 space-y-2 text-white/80">
+                    <li>• Frontend Mastery — 8 weeks</li>
+                    <li>• Interview Prep Bootcamp — 4 weeks</li>
+                    <li>• Presentation Lab — 3 weeks</li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+
+            {}
+            {children}
+
+          </div>
         </main>
       </div>
-    </ProtectedRoute>
+    </div>
   );
 }

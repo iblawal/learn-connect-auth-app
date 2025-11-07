@@ -12,7 +12,7 @@ export const generateToken = (userId: string, email: string): string => {
   };
 
   const token = jwt.sign(payload, process.env.JWT_SECRET as string, {
-    expiresIn: "7d", // Token expires in 7 days
+    expiresIn: "7d", 
   });
 
   return token;

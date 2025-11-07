@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import { verifyToken } from "../utils/generateToken";
 import User from "../models/User";
 
-// Extend Express Request type to include user
 declare global {
   namespace Express {
     interface Request {
@@ -19,7 +18,7 @@ export const protect = async (
   try {
     let token;
 
-    // Check for token in Authorization header
+   
     if (
       req.headers.authorization &&
       req.headers.authorization.startsWith("Bearer")
@@ -34,10 +33,10 @@ export const protect = async (
       });
     }
 
-    // Verify token
+   
     const decoded = verifyToken(token);
 
-    // Find user
+  
     const user = await User.findById(decoded.userId).select("-password");
     if (!user) {
       return res.status(401).json({
@@ -46,7 +45,7 @@ export const protect = async (
       });
     }
 
-    // Attach user to request
+ 
     req.user = user;
     next();
   } catch (error: any) {

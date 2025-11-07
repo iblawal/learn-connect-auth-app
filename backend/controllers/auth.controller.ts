@@ -219,14 +219,12 @@ export const resendVerificationCode = async (req: Request, res: Response) => {
   }
 };
 
-// @desc    Login user
-// @route   POST /api/auth/login
-// @access  Public
+
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    // Validation
+    
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -234,7 +232,7 @@ export const login = async (req: Request, res: Response) => {
       });
     }
 
-    // Find user
+    
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({
@@ -243,7 +241,7 @@ export const login = async (req: Request, res: Response) => {
       });
     }
 
-    // Check if email is verified
+ 
     if (!user.isVerified) {
       return res.status(403).json({
         success: false,
@@ -251,7 +249,7 @@ export const login = async (req: Request, res: Response) => {
       });
     }
 
-    // Check password
+    
     const isPasswordCorrect = await user.comparePassword(password);
     if (!isPasswordCorrect) {
       return res.status(401).json({
@@ -260,10 +258,10 @@ export const login = async (req: Request, res: Response) => {
       });
     }
 
-    // Get user ID as string
+  
     const userId = String(user._id);
 
-    // Generate token
+   
     const token = generateToken(userId, user.email);
 
     res.status(200).json({

@@ -9,7 +9,7 @@ interface EmailOptions {
 
 export const sendEmail = async (options: EmailOptions) => {
   try {
-    // Create transporter
+  
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -27,22 +27,19 @@ export const sendEmail = async (options: EmailOptions) => {
       html: options.html,
     };
 
-    // Send email
     const info = await transporter.sendMail(mailOptions);
-    console.log("✅ Email sent successfully:", info.messageId);
+    console.log(" Email sent successfully:", info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error("❌ Email sending failed:", error);
+    console.error(" Email sending failed:", error);
     throw new Error("Failed to send email");
   }
 };
 
-// Generate 6-digit verification code
 export const generateVerificationCode = (): string => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-// Email template for verification
 export const verificationEmailTemplate = (
   fullName: string,
   code: string

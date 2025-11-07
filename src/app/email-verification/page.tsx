@@ -1,11 +1,10 @@
 "use client";
-
 import React, { useState, Suspense } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authService } from "@/lib/service/auth.service";
-
+import "../styles/auth-bg.css";
 
 function EmailVerificationContent() {
   const router = useRouter();
