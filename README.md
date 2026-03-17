@@ -1,36 +1,100 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Learn Connect App
 
-## Getting Started
+Learn Connect App is a full-stack web application built with **Next.js** and **Express.js**.
+The project demonstrates a complete authentication system with a clean dashboard interface.
 
-First, run the development server:
+Users can create accounts, log in securely, and access protected pages. The goal of this project is to show how a modern full-stack application can be structured using a frontend framework together with a backend API.
 
-```bash
+---
+
+## Features
+
+* User registration system
+* Secure login authentication
+* Password hashing for security
+* Protected dashboard pages
+* Modern responsive UI
+* Full-stack architecture using Next.js and Express
+
+---
+
+## Tech Stack
+
+Frontend
+
+* Next.js
+* React
+* Tailwind CSS
+* TypeScript
+
+Backend
+
+* Node.js
+* Express.js
+* MongoDB
+* Mongoose
+
+Authentication
+
+* JSON Web Tokens (JWT)
+* bcrypt password hashing
+
+---
+
+## Project Structure
+
+The project is organized into different folders to separate the frontend, backend logic, and shared utilities.
+
+* **src/** – contains the Next.js frontend application
+* **dashboard/** – pages that require authentication
+* **lib/** – reusable helper functions and utilities
+* **public/** – static assets such as images and icons
+* **dist/** – compiled backend files
+
+---
+
+## Installation
+
+Clone the repository
+
+git clone https://github.com/iblawal/Learn-Connect-App.git
+
+Move into the project directory
+
+cd Learn-Connect-App
+
+Install the dependencies
+
+npm install
+
+---
+
+## Running the Project
+
+Start the development server
+
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+After starting the server, open your browser and go to
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+http://localhost:3000
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Future Improvements
 
-To learn more about Next.js, take a look at the following resources:
+Some features that could be added later include:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+* Google OAuth login
+* Password reset functionality
+* Role-based user permissions
+* Improved API security
+* Production deployment setup
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Author
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Lawal Ibrahim
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+A developer interested in building modern full-stack applications and scalable backend systems.
