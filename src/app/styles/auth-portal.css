@@ -1,0 +1,234 @@
+
+
+:root {
+  --portal-bg: #075985;     
+  --portal-accent: #0ea5e9; 
+  --portal-accent-dark: #0369a1; 
+  --portal-input-bg: #eff8ff;    
+  --portal-input-border: #bde3fb;
+  --portal-ink: #0c2a3e;
+}
+
+.portal-shell {
+  min-height: 100vh;
+  background: var(--portal-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3.5rem 1.25rem 2.5rem;
+}
+
+.portal-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 1.75rem;
+  text-align: center;
+}
+
+.portal-brand-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #ffffff;
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.portal-brand-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #7dd3fc; /* sky-300, pops against dark bg */
+}
+
+.portal-brand-tagline {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.portal-card {
+  width: 100%;
+  max-width: 30rem;
+  background: #ffffff;
+  border-radius: 6px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+  padding: 2.25rem 2.5rem;
+}
+
+.portal-label {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--portal-accent-dark);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.portal-input {
+  width: 100%;
+  padding: 0.7rem 0.875rem;
+  border-radius: 4px;
+  background: var(--portal-input-bg);
+  color: var(--portal-ink);
+  border: 1px solid var(--portal-input-border);
+  font-size: 0.9375rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.portal-input::placeholder {
+  color: #7a93a3;
+}
+
+.portal-input:focus {
+  outline: none;
+  border-color: var(--portal-accent);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.18);
+}
+
+.portal-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.portal-check-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.portal-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+  color: var(--portal-accent-dark);
+}
+
+.portal-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--portal-accent);
+}
+
+.portal-link {
+  color: var(--portal-accent-dark);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.portal-link:hover {
+  color: var(--portal-accent);
+}
+
+.portal-button-outline {
+  background: #ffffff;
+  color: var(--portal-accent-dark);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  padding: 0.7rem 1.75rem;
+  border-radius: 4px;
+  border: 1.5px solid var(--portal-accent-dark);
+  transition: background-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.portal-button-outline:hover:not(:disabled) {
+  background: var(--portal-accent-dark);
+  color: #ffffff;
+}
+
+.portal-button-outline:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.portal-button-block {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.portal-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  border-radius: 4px;
+  padding: 0.75rem 0.9rem;
+  font-size: 0.875rem;
+  margin-bottom: 1.25rem;
+}
+
+.portal-secondary-text {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.875rem;
+  margin-top: 1.5rem;
+}
+
+.portal-secondary-text a {
+  color: #ffffff;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.portal-footer {
+  margin-top: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.portal-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.25rem;
+}
+
+.portal-footer-links a {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.8125rem;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.portal-footer-links a:hover {
+  color: #ffffff;
+}
+
+/* Phone input override to match tinted field style */
+.intl-phone-portal .react-international-phone-input-container {
+  width: 100%;
+}
+.intl-phone-portal .react-international-phone-country-selector-button {
+  border: 1px solid var(--portal-input-border);
+  border-right: none;
+  border-radius: 4px 0 0 4px;
+  background: var(--portal-input-bg);
+  padding: 0 0.6rem;
+}
+.intl-phone-portal .react-international-phone-input {
+  width: 100%;
+  padding: 0.7rem 0.875rem;
+  border-radius: 0 4px 4px 0;
+  background: var(--portal-input-bg);
+  color: var(--portal-ink);
+  border: 1px solid var(--portal-input-border);
+  font-size: 0.9375rem;
+}
+.intl-phone-portal .react-international-phone-input:focus {
+  outline: none;
+  border-color: var(--portal-accent);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.18);
+}

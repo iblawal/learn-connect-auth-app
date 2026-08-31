@@ -1,18 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion } from "framer-motion";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { authService } from "@/lib/service/auth.service";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
 import { Eye, EyeOff } from "lucide-react";
-import "../styles/auth-bg.css";
-
+import "../styles/auth-portal.css";
 
 export default function SignupPage() {
-  const router = useRouter();
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -34,17 +30,17 @@ export default function SignupPage() {
     setError("");
 
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match!");
+      setError("Passwords do not match.");
       return;
     }
 
     if (formData.password.length < 8) {
-      setError("Password must be at least 8 characters long");
+      setError("Password must be at least 8 characters long.");
       return;
     }
 
     if (!phoneNumber) {
-      setError("Please enter your phone number");
+      setError("Please enter your phone number.");
       return;
     }
 
@@ -73,97 +69,51 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row items-center justify-center relative overflow-hidden animated-bg px-4 sm:px-6 md:px-10 py-12">
-    
+    <div className="portal-shell">
+      <div className="portal-brand">
+        <span className="portal-brand-mark">
+          <span className="portal-brand-dot" />
+          Learn &amp; Connect
+        </span>
+        <span className="portal-brand-tagline">Create Your Account</span>
+      </div>
 
-      {}
-      <div className="absolute top-[-20%] left-[-20%] w-[300px] sm:w-[400px] h-[300px] sm:h-[400px] bg-blue-500/30 rounded-full blur-[150px]"></div>
-      <div className="absolute bottom-[-20%] right-[-20%] w-[300px] sm:w-[400px] h-[300px] sm:h-[400px] bg-sky-400/30 rounded-full blur-[150px]"></div>
+      <div className="portal-card">
+        {error && <div className="portal-error">{error}</div>}
 
-      {}
-      <motion.div
-        initial={{ opacity: 0, x: -40 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-        className="w-full md:w-1/2 text-center md:text-left z-10 mb-10 md:mb-0"
-      >
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight mb-4 text-white">
-        Join <span className="text-blue-900">Learn & Connect</span>
-      </h1>
-        <p className="text-white/80 text-base sm:text-lg max-w-md mx-auto md:mx-0 mb-6">
-          Connect with global learners, boost your career, and unlock new
-          opportunities through personalized growth and mentorship.
-        </p>
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          className="inline-block bg-white/10 backdrop-blur-md px-6 py-3 rounded-full text-sm font-medium text-blue-900 border border-blue-400/40 shadow-[0_0_25px_rgba(147,197,253,0.3)]"
-        >
-          Trusted by 10,000+ learners worldwide 
-        </motion.div>
-      </motion.div>
-
-      {}
-      <motion.div
-        initial={{ opacity: 0, x: 40 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-         className="w-full md:w-1/2 max-w-md bg-white/10 backdrop-blur-lg border border-white/20 shadow-[0_0_30px_rgba(147,197,253,0.3)] rounded-2xl p-6 sm:p-8 mx-auto z-10"
-      >
-          <h2 className="text-2xl sm:text-3xl font-bold text-center text-blue-900 mb-2">
-          Create Account
-        </h2>
-        <p className="text-center text-white/70 mb-6 text-sm">
-          Start your journey with Learn & Connect today
-        </p>
-
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="mb-4 p-3 bg-red-500/20 border border-red-500/40 rounded-lg text-white text-sm text-center"
-          >
-            {error}
-          </motion.div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {}
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-semibold text-blue-900  mb-1">
+            <label htmlFor="fullName" className="portal-label">
               Full Name
             </label>
             <input
+              id="fullName"
               type="text"
               name="fullName"
-              placeholder=""
               value={formData.fullName}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2.5 rounded-lg bg-white/90 text-gray-900 border border-blue-300/30 focus:outline-none focus:ring-2 focus:ring-blue-300"
+              className="portal-input"
             />
           </div>
 
-          {}
           <div>
-            <label className="block text-sm font-semibold text-blue-900 mb-1">
-              Email Address
+            <label htmlFor="email" className="portal-label">
+              Email
             </label>
             <input
+              id="email"
               type="email"
               name="email"
-              placeholder=""
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2.5 rounded-lg bg-white/90 text-gray-900 border border-blue-300/30 focus:outline-none focus:ring-2 focus:ring-blue-300"
+              className="portal-input"
             />
           </div>
 
-          {}
           <div>
-            <label className="block text-sm font-semibold text-blue-900 mb-1">
+            <label htmlFor="phone" className="portal-label">
               Phone Number
             </label>
             <PhoneInput
@@ -171,101 +121,86 @@ export default function SignupPage() {
               value={phoneNumber}
               onChange={(phone) => setPhoneNumber(phone)}
               placeholder="Enter phone number"
-              className="intl-phone-custom"
+              className="intl-phone-portal"
             />
           </div>
 
-          {}
           <div>
-            <label className="block text-sm font-semibold text-blue-900 mb-1">
+            <label htmlFor="password" className="portal-label">
               Password
             </label>
             <div className="relative">
               <input
+                id="password"
                 type={showPassword ? "text" : "password"}
                 name="password"
-                placeholder="••••••••"
+                placeholder="At least 8 characters"
                 value={formData.password}
                 onChange={handleChange}
                 required
-                minLength={6}
-               className="w-full px-3 py-2.5 pr-10 rounded-lg bg-white/90 text-gray-900 border border-blue-300/30 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                minLength={8}
+                className="portal-input pr-10"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#0369a1]"
               >
-                {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
           </div>
 
-          {}
           <div>
-            <label className="block text-sm font-semibold text-brandGold   text-blue-900 mb-1">
+            <label htmlFor="confirmPassword" className="portal-label">
               Confirm Password
             </label>
             <div className="relative">
               <input
+                id="confirmPassword"
                 type={showConfirmPassword ? "text" : "password"}
                 name="confirmPassword"
-                placeholder="••••••••"
+                placeholder="Re-enter your password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 required
-                minLength={6}
-                className="w-full px-3 py-2.5 pr-10 rounded-lg bg-white/90 text-gray-900 border border-blue-300/30 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                minLength={8}
+                className="portal-input pr-10"
               />
               <button
                 type="button"
-                onClick={() =>
-                  setShowConfirmPassword(!showConfirmPassword)
-                }
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#0369a1]"
               >
-                {showConfirmPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
           </div>
 
-          {}
-          <motion.button
-            whileHover={{ scale: isLoading ? 1 : 1.02 }}
-            whileTap={{ scale: isLoading ? 1 : 0.98 }}
+          <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-blue-300 text-blue-900 font-semibold py-3 rounded-lg mt-4 hover:bg-blue-400 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(147,197,253,0.4)]"
+            className="portal-button-outline portal-button-block"
           >
-            {isLoading ? "Creating Account..." : "Sign Up"}
-          </motion.button>
+            {isLoading ? "Creating account…" : "Create Account"}
+          </button>
         </form>
+      </div>
 
-        <p className="text-center text-sm text-white/70 mt-6">
-          Already have an account?{" "}
-          <Link
-            href="/login"
-            className="text-blue-900 hover:text-white font-semibold transition"
-          >
-            Log In
-          </Link>
-        </p>
-      </motion.div>
+      <p className="portal-secondary-text">
+        Already have an account? <Link href="/login">Log in</Link>
+      </p>
 
-      {}
-      <style jsx global>{`
-        .intl-phone-custom .react-international-phone-input-container {
-          width: 100%;
-        }
-        .intl-phone-custom .react-international-phone-input {
-          width: 100%;
-          padding: 0.625rem 0.75rem;
-          border-radius: 0.5rem;
-          background: rgba(255, 255, 255, 0.9);
-          color: #1f2937;
-          border: 1px solid rgba(147, 197, 253, 0.4);
-        }
-      `}</style>
+      <div className="portal-footer">
+        <div className="portal-footer-links">
+          <a href="/help">Help</a>
+          <a href="/privacy">Privacy Policy</a>
+          <a href="/terms">Terms of Service</a>
+          <a href="/contact">Contact</a>
+        </div>
+      </div>
     </div>
   );
 }

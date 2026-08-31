@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Header from "@/components/Header";
+import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,20 +9,11 @@ import Link from "next/link";
 export default function HomePage() {
   return (
     <>
-      <Header />
+      <Navbar />
       <div className="font-sans scroll-smooth">
         <Hero />
 
-        {/* Temporary dashboard link */}
-      <Link
-        href="/dashboard"
-        className="rounded-lg bg-blue-600 px-6 py-3 text-white hover:bg-blue-700 transition"
-      >
-        Go to Dashboard
-      </Link>
-  
-
-        {}
+        {/* About */}
         <section
           id="about"
           className="py-24 bg-linear-to-b from-white to-blue-50 text-gray-800"
@@ -72,7 +63,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {}
+        {/* Services */}
         <section id="services" className="py-24 bg-white text-center">
           <div className="max-w-6xl mx-auto px-6 md:px-10">
             <motion.h2
@@ -129,13 +120,12 @@ export default function HomePage() {
           </div>
         </section>
 
-        {}
+        {/* Mission */}
         <section
           id="mission"
           className="py-24 bg-linear-to-b from-white to-blue-50 text-gray-800"
         >
           <div className="max-w-6xl mx-auto px-6 md:px-10 grid md:grid-cols-2 gap-16 items-center">
-            {}
             <motion.div
               initial={{ opacity: 0, x: -60 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -159,7 +149,6 @@ export default function HomePage() {
               </p>
             </motion.div>
 
-            {}
             <motion.div
               initial={{ opacity: 0, x: 60 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -196,7 +185,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {}
+        {/* Why choose us */}
         <section className="py-24 bg-white">
            <div className="max-w-6xl mx-auto px-6 md:px-10 text-center">
             <motion.h2
@@ -235,7 +224,6 @@ export default function HomePage() {
               viewport={{ once: true }}
               className="bg-white rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.15)] transition-all duration-500 hover:-translate-y-2"
             >
-              {}
               <div className="relative h-52 w-full">
                <Image
                  src={item.image}
@@ -246,7 +234,6 @@ export default function HomePage() {
                   <div className="absolute inset-0 bg-linear-to-t from-blue-900/30 via-transparent to-transparent"></div>
                </div>
 
-                  {}
                   <div className="p-8">
                     <h3 className="text-2xl font-semibold mb-3 text-blue-700">
                       {item.title}
@@ -259,8 +246,7 @@ export default function HomePage() {
          </div>
        </section>
 
-
-        {}
+        {/* Newsletter */}
         <section className="py-24 bg-linear-to-b from-blue-900 to-blue-800 text-white text-center relative overflow-hidden">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -293,8 +279,8 @@ export default function HomePage() {
           </motion.div>
         </section>
 
-          {}
-          <footer className="bg-blue-700 text-white py-16 mt-16">
+        {/* Footer */}
+        <footer className="bg-blue-700 text-white py-16 mt-16">
           <div className="max-w-6xl mx-auto px-6 md:px-10 grid md:grid-cols-3 gap-10">
             <div>
               <h3 className="text-2xl font-bold mb-4">Learn & Connect</h3>

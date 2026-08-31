@@ -6,6 +6,7 @@ declare global {
   namespace Express {
     interface Request {
       user?: any;
+      userId?: string;
     }
   }
 }
@@ -39,8 +40,9 @@ export const protect = async (
         message: "User not found",
       });
     }
-    
+
     req.user = user;
+    req.userId = String(user._id); // profile.controller.ts reads req.userId — this was missing
     next();
   } catch (error: any) {
     console.error("Auth middleware error:", error);
