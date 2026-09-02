@@ -51,3 +51,44 @@ export const updateProfile = async (req: any, res: Response) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
+// GET /api/users?search=&limit=
+// Returns a list of users for the student directory, excluding the requester.
+export const listUsers = async (req: any, res: Response) => {
+  try {
+    const search = typeof req.query.search === "string" ? req.query.search.trim() : "";
+    const limitParam = parseInt(req.query.limit as string, 10);
+    const limit = Number.isFinite(limitParam) && limitParam > 0 ? Math.min(limitParam, 100) : 50;
+
+    const filter: any = { _id: { $ne: req.userId } }; // exclude the current user from their own directory
+
+    if (search) {
+      const regex = new RegExp(search, "i");
+      filter.$or = [
+        { fullName: regex },
+        { email: regex },
+        { school: regex },
+        { course: regex },
+      ];
+    }
+
+    const users = await User.find(filter)
+      .select("-password -verificationCode -verificationCodeExpires")
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    const data = users.map((u) => ({
+      id: u._id.toString(),
+      fullName: u.fullName,
+      email: u.email,
+      avatar: u.avatar || null,
+      profileCompleted: u.profileCompleted || false,
+      school: u.school || null,
+      course: u.course || null,
+    }));
+
+    res.json(data);
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};

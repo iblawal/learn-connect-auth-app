@@ -55,7 +55,12 @@ export default function SignupPage() {
       });
 
       if (response) {
-        window.location.href = `/email-verification?email=${encodeURIComponent(formData.email)}`;
+        if (response.data?.isVerified) {
+          // Email service isn't set up — backend already auto-verified this account
+          window.location.href = `/login?verified=true`;
+        } else {
+          window.location.href = `/email-verification?email=${encodeURIComponent(formData.email)}`;
+        }
       }
     } catch (err: any) {
       setError(

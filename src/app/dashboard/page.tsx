@@ -153,9 +153,10 @@ export default function DashboardLayout({ children }: Props) {
   };
 
   useEffect(() => {
-    fetchCurrentUser();
-    fetchDirectory("");
-  }, [authUserFromCtx?.id]); 
+  if (!token) return;
+  fetchCurrentUser();
+  fetchDirectory("");
+}, [authUserFromCtx?.id, token]);
 
   useEffect(() => {
     const id = setTimeout(() => {
